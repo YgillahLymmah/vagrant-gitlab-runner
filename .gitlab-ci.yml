@@ -6,3 +6,4 @@ test_job:
   script:
     - echo "Running tests"
     - echo "Tests completed successfully"
+"C:\Users\limay\vagrant-gitlab-runner"
