@@ -1,0 +1,61 @@
+stages:
+  - compilar
+  - testes
+  - provision
+  - deploy
+  - aceitacao
+  - ambiente
+
+
+compilar_job:
+  stage: compilar
+  script:
+    - echo "Compilando a aplicação..."
+    
+
+
+testes_unitarios:
+  stage: testes
+  script:
+    - echo "Executando testes unitários..."
+    
+  variables:
+    MONGODB_VERSION: "5.0"  
+    DATABASE_URL: "mongodb://localhost:27017/testdb"  
+  services:
+    - name: mongo:5.0  
+  dependencies:
+    - compilar_job  
+
+
+job_provision:
+  stage: provision
+  script:
+    - ansible-playbook -i inventory ansible/playbook.yml
+  dependencies:
+    - testes_unitarios  
+  tags:
+    - docker
+
+
+deploy_job:
+  stage: deploy
+  script:
+    - export ANSIBLE_HOST_KEY_CHECKING=False
+    - ansible-playbook -i inventory ansible/deploy_playbook.yml
+  dependencies:
+    - job_provision  
+  tags:
+    - docker
+
+
+testes_aceitacao:
+  stage: aceitacao
+  image: postman/newman:alpine
+  script:
+    - export HOST_IP="192.168.56.8"  
+    - newman run postman-tests/TodoApp.postman_collection.json -e postman-tests/TodoApp-Vagrant.postman_environment.json
+  dependencies:
+    - deploy_job  
+  tags:
+    - docker

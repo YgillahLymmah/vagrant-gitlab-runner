@@ -1,0 +1,25 @@
+---
+- name: Baixar script de instalação do NVM
+  shell: |
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+  args:
+    creates: /home/{{ ansible_user }}/.nvm
+
+- name: Configurar o NVM no shell
+  shell: |
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  args:
+    executable: /bin/bash
+
+- name: Instalar Node.js versão 10.4.x
+  shell: |
+    source $HOME/.nvm/nvm.sh && nvm install 10.4.0
+  args:
+    executable: /bin/bash
+
+- name: Definir Node.js 10.4.x como padrão
+  shell: |
+    source $HOME/.nvm/nvm.sh && nvm alias default 10.4.0
+  args:
+    executable: /bin/bash

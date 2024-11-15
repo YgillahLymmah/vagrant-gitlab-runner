@@ -1,0 +1,6 @@
+---
+- name: Provisionar servidor de aplicação com Node.js
+  hosts: app
+  become: yes
+  roles:
+    - nodejs
